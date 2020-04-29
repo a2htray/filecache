@@ -43,7 +43,7 @@ type Cache interface {
 
 type Item struct {
 	expiration int64
-	filename string
+	filename   string
 }
 
 func (i Item) IsExpired() bool {
@@ -55,14 +55,14 @@ func (i Item) Filename() string {
 }
 
 type FileCache struct {
-	mutex sync.RWMutex
-	items map[string]Item
-	onSetHook func(k string, v interface{})
-	onDeleteHook func(k string, v interface{})
-	onAddHook func(k string, v interface{})
+	mutex         sync.RWMutex
+	items         map[string]Item
+	onSetHook     func(k string, v interface{})
+	onDeleteHook  func(k string, v interface{})
+	onAddHook     func(k string, v interface{})
 	onReplaceHook func(k string, originV interface{}, newV interface{})
-	dir string
-	monitor *monitor
+	dir           string
+	monitor       *monitor
 }
 
 func (f *FileCache) OnSetHook(onSetHook func(k string, v interface{})) {
@@ -100,7 +100,7 @@ func (f *FileCache) Set(k string, x interface{}, d time.Duration) {
 	f.onSetHook(k, x)
 }
 
-func (f *FileCache) set(k string, x interface{}, d time.Duration)  {
+func (f *FileCache) set(k string, x interface{}, d time.Duration) {
 	expiration := time.Now().Add(d).UnixNano()
 	filename := keyToFilename(k, expiration)
 	file, err := os.Create(path.Join(f.dir, filename))
@@ -120,7 +120,7 @@ func (f *FileCache) set(k string, x interface{}, d time.Duration)  {
 	}
 
 	f.items[k] = Item{
-		filename: filename,
+		filename:   filename,
 		expiration: expiration,
 	}
 }
@@ -204,7 +204,7 @@ func (f *FileCache) Add(k string, x interface{}, d time.Duration) (bool, error) 
 
 	f.items[k] = Item{
 		expiration: expiration,
-		filename: filename,
+		filename:   filename,
 	}
 
 	f.onAddHook(k, x)
@@ -226,7 +226,6 @@ func (f *FileCache) Get(k string) (interface{}, bool) {
 		_, _ = f.delete(k)
 		return nil, false
 	}
-
 
 	filename := path.Join(f.dir, f.items[k].filename)
 	content, err := ioutil.ReadFile(filename)
@@ -303,26 +302,26 @@ func (f *FileCache) DeleteExpired() (bool, error) {
 
 func New(dir string) *FileCache {
 	return &FileCache{
-		onSetHook: default2Hook,
-		onDeleteHook: default2Hook,
-		onAddHook: default2Hook,
+		onSetHook:     default2Hook,
+		onDeleteHook:  default2Hook,
+		onAddHook:     default2Hook,
 		onReplaceHook: default3Hook,
-		dir: dir,
-		items: make(map[string]Item),
+		dir:           dir,
+		items:         make(map[string]Item),
 	}
 }
 
 func NewWithMonitor(dir string, ci time.Duration) *FileCache {
 	fc := &FileCache{
-		onSetHook: default2Hook,
-		onDeleteHook: default2Hook,
-		onAddHook: default2Hook,
+		onSetHook:     default2Hook,
+		onDeleteHook:  default2Hook,
+		onAddHook:     default2Hook,
 		onReplaceHook: default3Hook,
-		dir: dir,
-		items: make(map[string]Item),
+		dir:           dir,
+		items:         make(map[string]Item),
 		monitor: &monitor{
 			interval: ci,
-			stop: make(chan bool),
+			stop:     make(chan bool),
 		},
 	}
 	go fc.monitor.Run(fc)
@@ -332,10 +331,10 @@ func NewWithMonitor(dir string, ci time.Duration) *FileCache {
 
 type monitor struct {
 	interval time.Duration
-	stop chan bool
+	stop     chan bool
 }
 
-func (m *monitor) Run(fc *FileCache)  {
+func (m *monitor) Run(fc *FileCache) {
 	ticker := time.NewTicker(m.interval)
 	for {
 		select {

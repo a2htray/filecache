@@ -198,8 +198,8 @@ func TestFileCache_DeleteExpired(t *testing.T) {
 }
 
 func TestNewWithMonitor(t *testing.T) {
-	fc := NewWithMonitor("D:\\workspace\\github.com\\a2htray\\filecache\\testdata", time.Second * 10)
-	fc.Set("key1", 11111, time.Second * 5)
+	fc := NewWithMonitor("D:\\workspace\\github.com\\a2htray\\filecache\\testdata", time.Second*10)
+	fc.Set("key1", 11111, time.Second*5)
 	for {
 		t.Log(fc.items)
 		continue
